@@ -51,9 +51,9 @@ SUBDIR+= libxshmfence
 
 .if ${XENOCARA_BUILD_GL:L} == "yes"
 SUBDIR+= libdrm
+SUBDIR+= libva
 SUBDIR+= mesa
 SUBDIR+= libGLU libGLw
-SUBDIR+= libva
 SUBDIR+= libepoxy
 .endif
 
