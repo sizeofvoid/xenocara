@@ -2,7 +2,7 @@
 
 .include <bsd.xconf.mk>
 
-LIB=	va
+LIB=	va_st
 
 NOPROFILE=
 
@@ -27,15 +27,12 @@ SRCS=	buffer.c \
 	subpicture.c \
 	surface.c
 
-#.if ${XENOCARA_BUILD_DRI:L} == "yes"
-#.endif
-
 .include "../Makefile.inc"
 
 CFLAGS+=	${C_VIS_ARGS}
 
 # XXX keep in sync with libva
-CPPFLAGS+=	-DVA_DRIVER_INIT_FUNC=__vaDriverInit_2_22 \
+CFLAGS +=	-DVA_DRIVER_INIT_FUNC=__vaDriverInit_1_22 \
 
 CPPFLAGS+=	-I${MESA_SRC}/src/gallium/frontends/va \
 		-I${MESA_SRC}/src/gallium/include \
