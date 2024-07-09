@@ -53,6 +53,7 @@ SUBDIR+= libxshmfence
 SUBDIR+= libdrm
 SUBDIR+= mesa
 SUBDIR+= libGLU libGLw
+SUBDIR+= libva
 SUBDIR+= libepoxy
 .endif
 
