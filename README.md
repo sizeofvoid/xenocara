@@ -30,7 +30,7 @@ organisation used in X.Org:
 In addition Xenocara uses the following directories:
 
 - dist: contains some of the 3rd party sources, when keeping them separate
-  helps the build system (fontconfig, xcb and xkeyboard-config)
+        helps the build system (fontconfig, xcb and xkeyboard-config)
 - distrib: all binary distribution related tools and data
 - etc: some default config files
 - share: make(1) configuration for Xenocara
@@ -39,10 +39,10 @@ At the top-level directory two files describe the individual
 components of Xenocara:
 
 - MODULES: lists all X.Org components (imported from the X.Org distribution
-  at [freedesktop archive](http://xorg.freedesktop.org/archive))
+           at [freedesktop archive](http://xorg.freedesktop.org/archive))
 - 3RDPARTY: lists all 3rd party software components provided in Xenocara,
-  either as dependencies of the X.Org software, or as complements
-  to it to provide a more useable default environment.
+            either as dependencies of the X.Org software, or as complements
+            to it to provide a more useable default environment.
 
 ## Compiling and installing
 
