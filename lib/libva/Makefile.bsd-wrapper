@@ -7,6 +7,6 @@ SHARED_LIBS += va 2.22
 
 CONFIGURE_ARGS= --disable-wayland
 CONFIGURE_ARGS+= \
-	--with-drivers-path=${DESTDIR}${X11BASE}/lib/modules/dri/
+	--with-drivers-path=${DESTDIR}${X11BASE}/lib/modules/drivers/
 
 .include <bsd.xorg.mk>
