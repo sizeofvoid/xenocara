@@ -27,7 +27,7 @@ obj: _xenocara_obj
 .include <bsd.lib.mk>
 .include <bsd.xorg.mk>
 
-.if ${WITH_GALLIUM_RADEONSI} == "yes"
+.if ${WITH_GALLIUM_R600} == "yes"
 GALLIUM_DRIVERS+=	r600
 CPPFLAGS+=	-DGALLIUM_R600
 .endif
@@ -37,30 +37,16 @@ GALLIUM_DRIVERS+=	radeonsi
 CPPFLAGS+=	-DGALLIUM_RADEONSI
 .endif
 
+.if ${WITH_LLVM} == "yes"
+CPPFLAGS+=	-DGALLIUM_LLVMPIPE
+.endif
+
 install:
 .for driver in ${GALLIUM_DRIVERS}
 	${INSTALL} ${INSTALL_COPY} ${INSTALL_STRIP} \
 	    -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
 	    lib${LIB}.so ${DESTDIR}${X11BASE}/lib/modules/drivers/${driver}_drv_video.so
 .endfor
-
-.if ${WITH_GALLIUM_RADEONSI} == "yes"
-SLIBS+= libamdgpuwinsys \
-	libaddrlib \
-	libamd_common \
-	libamd_common_llvm \
-	libaco \
-	libradeonsi_gfx6 \
-	libradeonsi_gfx7 \
-	libradeonsi_gfx8 \
-	libradeonsi_gfx9 \
-	libradeonsi_gfx10 \
-	libradeonsi_gfx103 \
-	libradeonsi_gfx11 \
-	libradeonsi_gfx115 \
-	libradeonsi
-.endif
-
 
 SLIBS+=	libdri \
 	libmesa \
@@ -85,15 +71,45 @@ SLIBS+=	libdri \
 	libsoftpipe \
 	libvtn
 
-.if ${WITH_VAAPI} == "yes"
-SLIBS+=	libva_st
-.endif
-
 .if ${WITH_SSE41} == "yes"
 SLIBS+=	libmesa_sse41
 .endif
 
-LDADD+=		-Wl,--as-needed -Wl,--allow-shlib-undefined -Wl,--start-group
+.if ${WITH_GALLIUM_R300} == "yes" || ${WITH_GALLIUM_R600} == "yes" || \
+    ${WITH_GALLIUM_RADEONSI} == "yes"
+SLIBS+=	libradeonwinsys
+.endif
+
+LDADD+=		-Wl,--as-needed -Wl,--allow-shlib-undefined -Wl,--whole-archive -Wl,--start-group
+
+.if ${WITH_VAAPI} == "yes"
+LDADD+=	${.CURDIR}/../libva_st/${__objdir}/libva_st.a -Wl,--no-whole-archive -Wl,-z,origin
+.endif
+
+.if ${WITH_GALLIUM_R600} == "yes"
+SLIBS+=	libr600
+.endif
+
+.if ${WITH_GALLIUM_RADEONSI} == "yes"
+SLIBS+= libamdgpuwinsys \
+	libaddrlib \
+	libamd_common \
+	libamd_common_llvm \
+	libaco \
+	libradeonsi_gfx6 \
+	libradeonsi_gfx7 \
+	libradeonsi_gfx8 \
+	libradeonsi_gfx9 \
+	libradeonsi_gfx10 \
+	libradeonsi_gfx103 \
+	libradeonsi_gfx11 \
+	libradeonsi_gfx115 \
+	libradeonsi
+.endif
+
+.if ${WITH_LLVM} == "yes"
+SLIBS+=	libllvmpipe
+.endif
 .for slib in ${SLIBS}
 LDADD+=		${.CURDIR}/../${slib}/${__objdir}/${slib}.a
 .endfor
@@ -101,6 +117,9 @@ LDADD+=		${.CURDIR}/../${slib}/${__objdir}/${slib}.a
 LDADD+=		-L${.CURDIR}/../libglapi/${__objdir} -lglapi
 LDADD+=		-lelf -lLLVM -lexpat -lz -lm -lpthread
 LDADD+=		-L${X11BASE}/lib -ldrm
+LDADD+=		-lxshmfence
+LDADD+=		-lxcb-present -lxcb-xfixes -lX11-xcb -lxcb -lxcb-sync
+LDADD+=		-lxcb-dri3 -lxcb-randr -lxcb-dri2
 
 .if ${WITH_GALLIUM_R300} == "yes" || ${WITH_GALLIUM_R600} == "yes"
 LDADD+=		-ldrm_radeon

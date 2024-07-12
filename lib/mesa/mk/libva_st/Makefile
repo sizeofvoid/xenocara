@@ -30,9 +30,11 @@ SRCS=	buffer.c \
 .include "../Makefile.inc"
 
 CFLAGS+=	${C_VIS_ARGS}
+CXXFLAGS+=	${CXX_VIS_ARGS}
 
 # XXX keep in sync with libva
-CFLAGS +=	-DVA_DRIVER_INIT_FUNC=__vaDriverInit_1_22 \
+CFLAGS +=	-DVA_DRIVER_INIT_FUNC=__vaDriverInit_1_22
+CPPFLAGS +=	-DVA_DRIVER_INIT_FUNC=__vaDriverInit_1_22
 
 CPPFLAGS+=	-I${MESA_SRC}/src/gallium/frontends/va \
 		-I${MESA_SRC}/src/gallium/include \
