@@ -1,7 +1,6 @@
 #	$OpenBSD: Makefile,v 1.11 2024/06/17 01:29:12 jsg Exp $
 
-# gallium_drv_video
-LIB=	r600_drv_video
+LIB=	gallium_drv_video
 
 NOPROFILE=
 
@@ -23,17 +22,13 @@ CPPFLAGS+=	-I${MESA_SRC}/src/gallium/include \
 		-I${MESA_SRC}/generated/src/gallium/drivers \
 		-DGALLIUM_SOFTPIPE
 
-install:
-	${INSTALL} ${INSTALL_COPY} ${INSTALL_STRIP} \
-	    -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
-	    lib${LIB}.so ${DESTDIR}${X11BASE}/lib/modules/drivers/
-
 obj: _xenocara_obj
 
 .include <bsd.lib.mk>
 .include <bsd.xorg.mk>
 
 .if ${WITH_GALLIUM_RADEONSI} == "yes"
+GALLIUM_DRIVERS+=	r600
 CPPFLAGS+=	-DGALLIUM_R600
 .endif
 
@@ -41,6 +36,13 @@ CPPFLAGS+=	-DGALLIUM_R600
 GALLIUM_DRIVERS+=	radeonsi
 CPPFLAGS+=	-DGALLIUM_RADEONSI
 .endif
+
+install:
+.for driver in ${GALLIUM_DRIVERS}
+	${INSTALL} ${INSTALL_COPY} ${INSTALL_STRIP} \
+	    -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+	    lib${LIB}.so ${DESTDIR}${X11BASE}/lib/modules/drivers/${driver}_drv_video.so
+.endfor
 
 .if ${WITH_GALLIUM_RADEONSI} == "yes"
 SLIBS+= libamdgpuwinsys \
@@ -60,7 +62,7 @@ SLIBS+= libamdgpuwinsys \
 .endif
 
 
-SLIBS=	libdri \
+SLIBS+=	libdri \
 	libmesa \
 	libglsl \
 	libglcpp \
@@ -95,6 +97,18 @@ LDADD+=		-Wl,--as-needed -Wl,--allow-shlib-undefined -Wl,--start-group
 .for slib in ${SLIBS}
 LDADD+=		${.CURDIR}/../${slib}/${__objdir}/${slib}.a
 .endfor
+
+LDADD+=		-L${.CURDIR}/../libglapi/${__objdir} -lglapi
+LDADD+=		-lelf -lLLVM -lexpat -lz -lm -lpthread
+LDADD+=		-L${X11BASE}/lib -ldrm
+
+.if ${WITH_GALLIUM_R300} == "yes" || ${WITH_GALLIUM_R600} == "yes"
+LDADD+=		-ldrm_radeon
+.endif
+
+.if ${WITH_GALLIUM_RADEONSI} == "yes"
+LDADD+=		-ldrm_amdgpu
+.endif
 
 LDADD+=		${BUILD_ID_SHA1} -Wl,--gc-sections \
 		-Wl,--version-script ${MESA_SRC}/src/gallium/targets/va/va.sym
